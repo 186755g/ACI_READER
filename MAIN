@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -e
+
+cd "$(dirname "$0")"
+
+PORT="${PORT:-8000}"
+
+while python3 - "$PORT" <<'PY'
+import socket, sys
+port = int(sys.argv[1])
+s = socket.socket()
+s.settimeout(1)
+try:
+    s.connect(("127.0.0.1", port))
+except Exception:
+    raise SystemExit(0)
+else:
+    raise SystemExit(1)
+finally:
+    s.close()
+PY
+ do
+  PORT=$((PORT + 1))
+done
+
+if ! python3 -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:${PORT}/', timeout=2)" >/dev/null 2>&1; then
+  nohup python3 -m http.server "$PORT" --directory . >/tmp/aci_reader_server.log 2>&1 &
+fi
+
+URL="http://127.0.0.1:${PORT}/"
+echo "الموقع يعمل على: ${URL}"
+
+if command -v xdg-open >/dev/null 2>&1; then
+  xdg-open "$URL" >/dev/null 2>&1 || true
+fi
+
+if command -v google-chrome >/dev/null 2>&1; then
+  google-chrome "$URL" >/dev/null 2>&1 || true
+fi
+
+if command -v chromium >/dev/null 2>&1; then
+  chromium "$URL" >/dev/null 2>&1 || true
+fi
+
+exit 0

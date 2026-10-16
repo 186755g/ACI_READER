@@ -1,205 +1,165 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>مقارنة المنافست وكشف ACID</title>
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>مقارنة المنافست وكشف ACID</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<style>
-:root{--bg:#eef2f3;--c:#fff;--t:#14262e;--m:#5d7078;--p:#0d5c63;--p2:#e0f0f0;--b:#cfdadd;--ok:#dff3e4;--bad:#ffd9d4;--warn:#fff1cc}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--t);font:15px/1.55 "Segoe UI",Tahoma,Arial,sans-serif}
-header{background:var(--p);color:#fff;padding:14px 18px}
-header h1{margin:0;font-size:20px}header p{margin:2px 0 0;opacity:.85;font-size:13px}
-main{max-width:1200px;margin:auto;padding:14px}
-.box{background:var(--c);border:1px solid var(--b);border-radius:6px;padding:12px;margin-bottom:12px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:700px){.grid{grid-template-columns:1fr}}
-.drop{border:2px dashed var(--b);border-radius:6px;padding:16px;text-align:center;cursor:pointer;color:var(--m)}
-.drop.on{border-color:var(--p);background:var(--p2)}
-.drop b{display:block;color:var(--t);margin-bottom:4px}
-button,select,input[type=search]{font:inherit;padding:7px 12px;border:1px solid var(--b);border-radius:5px;background:#fff}
-button{cursor:pointer}button.main{background:var(--p);color:#fff;border-color:var(--p);font-weight:600}
-button:focus-visible,select:focus-visible,input:focus-visible,[contenteditable]:focus-visible{outline:2px solid var(--p)}
-.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
-.tabs button.on{background:var(--p);color:#fff;border-color:var(--p)}
-.wrap{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:14px}
-th,td{border:1px solid var(--b);padding:5px 8px;text-align:right;vertical-align:top}
-th{background:var(--p2);white-space:nowrap}
-td[contenteditable]:hover{background:var(--warn)}
-mark{background:var(--bad);border-radius:3px;padding:0 2px}
-.num{direction:ltr;unicode-bidi:plaintext;font-family:Consolas,monospace;text-align:left}
-.cx{background:#f5d0cc;color:#7a1c12;border-radius:3px;padding:0 5px;font-size:12px}
-.conf{font-weight:700}.m{color:var(--m);font-size:13px}
-#log div{color:#8a2418;font-size:13px}
-details{margin-bottom:8px}summary{cursor:pointer;font-weight:600}
-@media print{header,.drop,#ctl,.tabs,details,#prev{display:none}body{background:#fff}}
-</style></head><body>
-<header><h1>مقارنة المنافست وكشف ACID</h1><p>كل المعالجة بتتم في المتصفح عندك، والملفات مش بتترفع لأي سيرفر.</p></header>
-<main>
-<div class="grid">
- <label class="drop" id="dm"><b>ملفات المنافست (PDF)</b>اسحب الملفات هنا أو اضغط للاختيار<input id="fm" type="file" accept=".pdf" multiple hidden></label>
- <label class="drop" id="dk"><b>ملفات كشف ACID (DOCX / XLSX / CSV)</b>اسحب الملفات هنا أو اضغط للاختيار<input id="fk" type="file" accept=".docx,.xlsx,.xls,.csv" multiple hidden></label>
-</div>
-<div id="log" class="box" hidden></div>
-<div class="box" id="prev" hidden><b>معاينة المقروء (اضغط على أي خلية لتعديلها قبل المقارنة)</b><div id="pv"></div></div>
-<div class="box row" id="ctl">
- <button class="main" id="go">قارن</button>
- <label>نسبة التشابه: <input type="range" id="th" min="50" max="100" value="80"> <b id="thv">80%</b></label>
- <select id="ft"><option value="">كل الرحلات</option></select>
- <select id="fy"><option value="">كل الأنواع</option><option>سيارات</option><option>بضاعة</option><option>شاحنات</option></select>
- <label><input type="checkbox" id="hc" checked> إخفاء الملغي</label>
- <input type="search" id="q" placeholder="بحث بالاسم أو ACID">
- <button id="ex">تصدير Excel</button><button onclick="print()">طباعة / PDF</button>
-</div>
-<div class="box" id="out" hidden><div class="tabs" id="tabs"></div><div class="wrap" id="res"></div></div>
-</main>
+<style>:root{--bg:#eef3f4;--card:#ffffff;--paper:rgba(255,255,255,.94);--panel:rgba(248,250,251,.96);--tx:#17313d;--tx-strong:#0f1f2a;--tx-soft:#3f5864;--mu:#47606a;--pr:#0d5c63;--pr-strong:#0a4d52;--soft:#e6f1f3;--soft-strong:#d9ecee;--bd:#c8d9de;--bd-strong:#a9c1c8;--warn:#fff4cc;--warn-text:#805d12;--danger:#d64a4a;--success:#0f7d63;--shadow:rgba(11,36,42,.12)}
+@media(prefers-color-scheme:dark){:root{--bg:#10191c;--card:#182a30;--paper:rgba(24,42,48,.92);--panel:rgba(17,31,36,.95);--tx:#edf6f7;--tx-strong:#f6fdff;--tx-soft:#bfd3d8;--mu:#b6c8cc;--pr:#2a8f98;--pr-strong:#39a7ac;--soft:#17363d;--soft-strong:#21424a;--bd:#35535b;--bd-strong:#4d7178;--warn:#483a18;--warn-text:#f2d38a;--danger:#ff8b7a;--success:#65d2aa;--shadow:rgba(0,0,0,.34)}}
+*{box-sizing:border-box}body{position:relative;overflow-x:hidden;margin:0;background:linear-gradient(180deg, rgba(8,17,18,.22), rgba(8,17,18,.64)),url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80') center center / cover no-repeat fixed;color:var(--tx);font:600 16px/1.7 Tahoma,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;letter-spacing:.05px;text-rendering:optimizeLegibility}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(circle at center, rgba(255,255,255,.12), rgba(5,14,17,.46) 42%, rgba(5,14,17,.74));pointer-events:none}
+header{background:linear-gradient(135deg,var(--pr),var(--pr-strong));color:#fff;padding:14px 18px;box-shadow:0 8px 20px rgba(8,34,40,.18);border-bottom:1px solid rgba(255,255,255,.15)}header h1{margin:0;font-size:23px;font-weight:800;line-height:1.35}header p{margin:2px 0 0;font-size:13px;opacity:.97;font-weight:700}
+main{max-width:1200px;margin:auto;padding:12px}.box{background:var(--paper);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:12px;backdrop-filter:blur(4px);box-shadow:0 3px 12px var(--shadow)}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:700px){.g{grid-template-columns:1fr}}
+.drop{display:block;border:2px dashed var(--bd-strong);border-radius:10px;padding:18px;text-align:center;cursor:pointer;color:var(--tx-soft);font-weight:700;background:rgba(255,255,255,.42);transition:border-color .2s ease, background .2s ease, transform .2s ease;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}.drop:hover{border-color:var(--pr);background:rgba(230,241,243,.7)}.drop.on{border-color:var(--pr);background:rgba(230,241,243,.9);transform:translateY(-1px)}.drop b{display:block;color:var(--tx-strong);font-size:16px;margin-bottom:4px}
+button,select,input[type=search]{font:inherit;padding:7px 11px;border:1px solid var(--bd-strong);border-radius:6px;background:var(--card);color:var(--tx-strong);font-size:15px;font-weight:700;transition:all .2s ease, transform .15s ease, box-shadow .2s ease}
+button{cursor:pointer;box-shadow:0 3px 10px rgba(14,35,39,.08)}button:hover{transform:translateY(-1px);box-shadow:0 7px 16px rgba(13,92,99,.12)}button:active{transform:translateY(0) scale(.98)}button:focus-visible,select:focus-visible,input[type=search]:focus-visible{outline:3px solid rgba(13,92,99,.2);outline-offset:1px}.m{background:linear-gradient(135deg,var(--pr),var(--pr-strong));color:#fff;border-color:var(--pr);font-weight:800}.m:hover{box-shadow:0 10px 18px rgba(13,92,99,.22)}
+.r{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}.tabs button{transition:all .2s ease, transform .15s ease;background:rgba(255,255,255,.72);border-color:var(--bd-strong)}.tabs .on{background:linear-gradient(135deg,var(--pr),var(--pr-strong));color:#fff;border-color:var(--pr)}
+.w{overflow-x:auto;border-radius:8px;border:1px solid var(--bd);background:rgba(255,255,255,.7)}table{width:100%;border-collapse:collapse;font-size:14px;font-weight:600;table-layout:auto}th,td{border:1px solid var(--bd);padding:7px 9px;text-align:right;vertical-align:top;color:var(--tx-strong);background:rgba(255,255,255,.24)}th{background:var(--soft);white-space:nowrap;font-weight:800;color:var(--tx-strong);border-bottom:2px solid var(--bd-strong)}
+.n{direction:ltr;unicode-bidi:plaintext;font-family:Consolas,"Courier New",monospace;text-align:left;font-size:13px;font-weight:800;color:var(--tx-strong)}.mu{color:var(--tx-strong);font-size:13px;font-weight:700}.bad{background:var(--warn);color:var(--warn-text)}#log,#info,.box,.drop,.w,table,th,td,.tabs,.tabs button,#out,#res{color:var(--tx-strong)}#log{background:rgba(255,245,245,.98);border:1px solid #f0caca;color:#3d2626}#log div{color:#7f1f1f;font-size:13px;font-weight:700}#info{background:rgba(240,249,250,.98);border:1px solid var(--bd);color:var(--tx-strong)}#info .mu{color:var(--tx-strong)}#info>div{margin-top:4px}#out>p,.mu{color:var(--tx-strong)}input[type=search]{background:rgba(255,255,255,.96);color:var(--tx-strong);border-color:var(--bd-strong)}input[type=search]::placeholder{color:var(--mu);opacity:1}select{background:rgba(255,255,255,.96);color:var(--tx-strong);border-color:var(--bd-strong)}input[type=range]{accent-color:var(--pr)}th,td{color:var(--tx-strong);background:rgba(255,255,255,.18)}th{background:var(--soft)}.tabs button{background:rgba(255,255,255,.84);color:var(--tx-strong)}.tabs .on{color:#fff}.drop{background:rgba(255,255,255,.7);color:var(--tx-strong)}.drop b{color:var(--tx-strong)}
+#printArea{display:none}.print-report{direction:rtl;text-align:right;background:#fff;color:#000;padding:12mm;font-family:"Segoe UI",Tahoma,Arial,sans-serif}
+.print-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #0d5c63}
+.print-header h2{margin:0;font-size:24px;color:#0d5c63}
+.print-summary{margin:10px 0 16px;padding:10px 12px;background:#f3f7f7;border:1px solid #d7e4e6;border-radius:8px;font-size:13px;line-height:1.8}
+.print-section{margin-top:18px;page-break-inside:avoid;break-inside:avoid}
+.print-section h3{margin:0 0 10px;color:#0d5c63;font-size:18px;padding-bottom:6px;border-bottom:1px solid #d7e4e6}
+.print-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.print-table th,.print-table td{border:1px solid #c7d1d4;padding:6px 8px;text-align:right;vertical-align:top;word-wrap:break-word;color:#000}
+.print-table thead{display:table-header-group}
+.print-table tr{page-break-inside:avoid;break-inside:avoid}
+.print-table th{background:#edf6f6;font-weight:700}
+.print-table .ltr,.print-code{direction:ltr;unicode-bidi:plaintext;font-family:Consolas,"Courier New",monospace;text-align:left;background:transparent}
+.print-empty{padding:12px;border:1px dashed #c7d1d4;background:#f9f9f9;color:#555;border-radius:6px}
+@media print{html,body{background:#fff !important;color:#000 !important}.print-report{padding:0}.print-report *{color:#000 !important;background:transparent !important;box-shadow:none !important;text-shadow:none !important}
+body>*:not(#printArea){display:none !important}#printArea{display:block !important;position:static !important;width:100% !important;max-width:none !important;margin:0 !important;padding:0 !important;background:#fff !important}
+@page{size:A4 landscape;margin:12mm}} </style></head><body>
+<header><h1>مقارنة المنافست وكشف ACID</h1><p>كل المعالجة في المتصفح، والملفات ما بتتبعتش لأي سيرفر.</p></header><main>
+<div class="g"><label class="drop" id="d1"><b>ملفات المنافست (PDF)</b>اسحب أو اضغط للاختيار<input id="f1" type="file" accept=".pdf" multiple hidden></label>
+<label class="drop" id="d2"><b>ملفات كشف ACID (DOCX / XLSX / CSV)</b>اسحب أو اضغط للاختيار<input id="f2" type="file" accept=".docx,.xlsx,.xls,.csv" multiple hidden></label></div>
+<div class="box" id="log" hidden></div><div class="box" id="info" hidden></div>
+<div class="box r" id="ctl"><button class="m" id="go">قارن</button><label>نسبة التشابه: <input type="range" id="th" min="50" max="100" value="80"> <b id="tv">80%</b></label>
+<select id="ty"><option value="">كل الأنواع</option><option>سيارات تصدير</option><option>سيارات تربتيك</option><option>بضاعة</option><option>شاحنات</option></select>
+<label><input type="checkbox" id="hc" checked> إخفاء الملغي</label><input type="search" id="q" placeholder="بحث بالاسم أو ACID"><button id="ex">تصدير Excel</button><button id="pdf" title="اختار Save as PDF من نافذة الطباعة">تصدير PDF</button><button id="clr">مسح الكل</button></div>
+<div class="box" id="res" hidden><div class="tabs" id="tabs"></div><div class="w" id="out"></div></div></main>
+<div id="printArea" aria-live="polite"></div>
 <script>
-const $=s=>document.querySelector(s);
-const S={rows:[],res:null,tab:'c1',n:0};
 const COMMON=new Set('محمد احمد محمود السيد عبد ابراهيم علي حسن مصطفي عبدالله ابو'.split(' '));
-const TABS={c1:'تطابق كامل',c2:'ACID متطابق والاسم مختلف',c3:'اسم متشابه وACID مختلف',c4:'ACID قريب',sr:'بحث'};
+const norm=s=>String(s||'').replace(/[\u200e\u200f\u202a-\u202e\u0003]/g,' ').normalize('NFKC').replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/\s+/g,' ').trim();
+const toks=s=>norm(String(s||'').replace(/\(.*?\)/g,' ')).split(' ').filter(w=>/^[\u0621-\u064A]{2,}$/.test(w));
+const lev=(a,b)=>{let p=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){const c=[i];for(let j=1;j<=b.length;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[b.length]};
+const lsim=(a,b)=>a||b?1-lev(a,b)/Math.max(a.length,b.length):0;
+const hasGreek=s=>/[\u0380-\u03ff]/.test(s);
+// فك الترميز: حروف يونانية -> عربية، وقلب المقاطع العربية فقط (الأرقام واللاتيني تفضل زي ما هي)
+function dec(s){s=s.replace(/\u0003/g,' ').replace(/\u0012/g,'/');let o='';for(const c of s){const k=c.charCodeAt(0);o+=k>=0x380&&k<=0x3ff?String.fromCharCode(0xfe00+k-0x300):c}
+  o=o.normalize('NFKC');return o.split(/([A-Za-z0-9]+)/).map((p,i)=>i%2?p:[...p].reverse().join('')).join('').replace(/\s+/g,' ').trim()}
+const typeOf=p=>/^BSVXS/.test(p)?'سيارات تصدير':/^BSVS/.test(p)?'سيارات تربتيك':/^BSCS/.test(p)?'بضاعة':/^BSES/.test(p)?'شاحنات':'';
+const POL=/^BS[A-Z]{2,3}\d{4,7}[A-D]?$/;
+const cleanName=s=>toks(s).filter(w=>!/^(بدون|صحبه|فارغ|لوحه|رقم|شاسيه)$/.test(w)).join(' ');
+
+function parseTypeA(items,fileName,page){
+  const H={};for(const it of items){const t=it.str.trim();if(['cons','shipperTaxNu','consTaxNum','acid','sub_num','descr','weight','package'].includes(t))H[t]=it.x+it.w/2}
+  if(!H.cons||!H.acid||!H.sub_num)return[];
+  const colOf=it=>{const c=it.x+it.w/2;let b='',d=1e9;for(const k in H){const e=Math.abs(H[k]-c);if(e<d){d=e;b=k}}return b};
+  const pols=items.filter(i=>POL.test(i.str.trim())||/^BS[A-Z]{2,3}\d{4,7}$/.test(i.str.trim())).sort((a,b)=>b.y-a.y);
+  const rows=[];
+  pols.forEach((p,i)=>{
+    const top=p.y+8,bot=i+1<pols.length?pols[i+1].y+8:-1e9;
+    const band=items.filter(it=>it.y<=top&&it.y>bot).sort((a,b)=>b.y-a.y||b.x-a.x);
+    const col=k=>band.filter(it=>colOf(it)===k&&it!==p);
+    let pol=p.str.trim();
+    for(const it of col('sub_num')){const t=it.str.trim();if(/^\d+$/.test(t)&&pol.replace(/\D/g,'').length<7)pol+=t;else if(/^[A-D]$/.test(t)&&pol.replace(/\D/g,'').length>=7)pol+=t}
+    const digits=k=>col(k).map(i=>i.str.trim()).filter(t=>/^\d+$/.test(t)).join('');
+    let acid=digits('acid');if(!/^\d{19}$/.test(acid))acid=acid.length>19?acid.slice(0,19):acid;
+    let id=digits('consTaxNum');if(id.length!==14)id=digits('shipperTaxNu')
+    const name=cleanName(col('cons').map(i=>i.str).join(' '));
+    rows.push({file:fileName,page,policy:pol,type:typeOf(pol),name,acid,nid:id,canceled:band.some(i=>/cancel/i.test(i.str))});
+  });return rows}
+
+function parseTypeB(items,fileName,page){
+  const rows=[];let buf=[];
+  for(const it of items){const s=dec(it.str);if(!s)continue;
+    if(/^BS[A-Z]{2,3}\d{7}[A-D]?$/.test(s)){
+      const ac=buf.find(t=>/^\d{19}$/.test(t));const ii=buf.map(t=>/^\d{14}$/.test(t)).lastIndexOf(true);
+      const nm=[];for(let k=ii-1;k>=0&&nm.length<3;k--){if(/^[\u0621-\u064A ]+$/.test(buf[k])&&!/سيارة|شاسيه|لوحة|فارغ|تصدير/.test(buf[k]))nm.unshift(buf[k]);else break}
+      rows.push({file:fileName,page,policy:s,type:typeOf(s),name:cleanName(nm.join(' ')),acid:ac||'',nid:ii>=0?buf[ii]:'',canceled:buf.some(t=>/cancel/i.test(t))});buf=[]}
+    else buf.push(s)}
+  return rows}
+
+async function readPdf(file,pdfjs,log){
+  const pdf=await pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;const all=[];let type='';
+  for(let n=1;n<=pdf.numPages;n++){try{
+    const tc=await(await pdf.getPage(n)).getTextContent();
+    const items=tc.items.filter(i=>i.str&&i.str.trim()).map(i=>({str:i.str,x:i.transform[4],y:i.transform[5],w:i.width||0}));
+    if(!type)type=items.some(i=>hasGreek(i.str))?'B':'A';
+    const r=(type==='B'?parseTypeB:parseTypeA)(items,file.name,n);all.push(...r);
+    if(!r.length)log&&log(`الصفحة ${n} من ${file.name}: لم تُقرأ`);
+  }catch(e){log&&log(`فشل قراءة الصفحة ${n} من ${file.name}`)}}
+  return{rows:all,type}}
+
+function nameScore(a,b){const x=toks(a),y=toks(b);if(!x.length||!y.length)return{s:0,m:0,d:0};
+  const used=new Set();let m=0,d=0;for(const t of x){let bj=-1,bs=.85;y.forEach((u,j)=>{if(!used.has(j)){const s=lsim(t,u);if(s>=bs){bs=s;bj=j}}});if(bj>=0){used.add(bj);m++;if(!COMMON.has(t))d++}}
+  const s=Math.max(2*m/(x.length+y.length),lsim(x.join(''),y.join('')));return{s:Math.round(s*100),m,d}}
+
+function compare(man,sheet,th){
+  const R={full:[],acidMismatch:[],nameSimilar:[],acidNear:[]},byAcid=new Map(sheet.filter(r=>r.acid).map(r=>[r.acid,r]));
+  for(const m of man){
+    if(m.acid&&byAcid.has(m.acid)){const s=byAcid.get(m.acid),n=nameScore(m.name,s.name);R[n.s>=th?'full':'acidMismatch'].push({m,s,score:n.s});continue}
+    for(const s of sheet){
+      if(m.acid&&s.acid&&m.acid.length===s.acid.length&&lev(m.acid,s.acid)===1)R.acidNear.push({m,s,score:99});
+      const n=nameScore(m.name,s.name);if(n.s>=th&&n.m>=2&&n.d>=1)R.nameSimilar.push({m,s,score:n.s})}}
+  return R}
+
+function sheetFromRows(rows,fileName){const out=[];let ci=1,ai=2;
+  for(const r of rows){const c=r.map(x=>String(x??'').replace(/\s+/g,' ').trim());
+    const h=c.findIndex(x=>/ACID/i.test(x)&&!/^\d/.test(x));if(h>=0){ai=h;const n=c.findIndex(x=>/اسم/.test(x));ci=n>=0?n:Math.max(0,h-1);continue}
+    const acid=(c[ai]||'').replace(/\D/g,'');if(acid.length>=8&&c[ci])out.push({file:fileName,name:c[ci],acid,note:c.slice(ai+1).join(' ')})}
+  return out}
+
+
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const $=id=>document.getElementById(id),S={man:[],sheet:[],R:null,tab:'full'};
+const L={full:'تطابق كامل',acidMismatch:'ACID متطابق والاسم مختلف',nameSimilar:'اسم متشابه وACID مختلف',acidNear:'ACID قريب'};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const rev=s=>[...s].reverse().join('');
-const nd=s=>s.replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c)).replace(/[۰-۹]/g,c=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(c));
-function norm(s){
- s=nd(s||'').replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي').toLowerCase().replace(/[^\u0621-\u064Aa-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
- for(let i=0;i<3;i++)s=s.replace(/(^| )(عبد|ابو|ابن|ام)\s+(?=\S)/g,'$1$2').replace(/ (الدين)(?= |$)/g,'$1');
- return s}
-function lev(a,b){if(a===b)return 0;const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
-const wsim=(a,b)=>a===b?1:1-lev(a,b)/Math.max(a.length,b.length);
-// مقارنة اسمين (بعد التطبيع) بنافذة منزلقة بطول اسم الكشف
-function cmp(m,k){
- const a=m.split(' ').filter(Boolean),b=k.split(' ').filter(Boolean);
- if(!a.length||!b.length)return{s:0,ok:false};
- const n=b.length,W=a.length<n?1:a.length-n+1;let best={s:-1,ok:false};
- for(let i=0;i<W;i++){let tot=0,hit=false,cnt=0;
-  for(let j=0;j<n;j++){const x=a[i+j];if(x===undefined)continue;const s=wsim(x,b[j]);tot+=s;
-   if(s>=.85){cnt++;if(!COMMON.has(x)&&!COMMON.has(b[j]))hit=true}}
-  const sc=tot/n;if(sc>best.s)best={s:sc,ok:hit||cnt>=3}}
- return best}
-// ---------- قراءة PDF ----------
-const WORKER='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-async function initPdf(){if(pdfjsLib.GlobalWorkerOptions.workerSrc)return;
- const t=await(await fetch(WORKER)).text();pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob([t],{type:'text/javascript'}))}
-function unscr(s){let o='';for(const ch of s){const c=ch.charCodeAt(0);o+=c>=0x380&&c<=0x3FF?String.fromCharCode(0xFE00+(c-0x300)):c===3?' ':ch}return rev(o.normalize('NFKC'))}
-function polOf(t){
- let m=t.match(/([A-Z]{3,6})(\d{6,8})(?!\d)/),L,D;
- if(m){L=m[1];D=m[2]}else{m=t.match(/(?<!\d)(\d{6,8})([A-Z]{3,6})/);if(!m)return'';D=m[1];L=m[2]}
- if(!/^45/.test(D)&&/^45/.test(rev(D)))D=rev(D);return L+D}
-const typeOf=p=>/^BSV/.test(p)?'سيارات':/^BSC/.test(p)?'بضاعة':/^BSE/.test(p)?'شاحنات':'';
-function parsePdfLines(lines,src,trip,garbled){
- const out=[];
- lines.forEach((strs,i)=>{
-  const txt=strs.join(' ');const pol=polOf(txt);
-  const runs=strs.map(s=>s.replace(/\s/g,'')).filter(s=>/^\d{9,19}$/.test(s));
-  let acid='',nid='';
-  for(let r of runs){if(garbled&&!/^(99|10|3279)/.test(r)&&/^(99|10|3279)/.test(rev(r))&&r.length!==14)r=rev(r);
-   if(r.length===14&&/^[23]/.test(r))nid=nid||r;else if(!acid&&/^(99|10|3279)/.test(r))acid=r}
-  if(/^9999102/.test(acid)&&acid.length<19){const nx=lines[i+1];
-   if(nx&&nx.length&&nx.every(s=>/^\d+$/.test(s.replace(/\s/g,'')))){const j=acid+nx.map(s=>s.replace(/\s/g,'')).join('');if(j.length<=19)acid=j}}
-  if(!pol&&!acid)return;
-  const ar=strs.filter(s=>/[\u0600-\u06FF]/.test(s)&&!/\d/.test(s)&&s.split(/\s+/).length>=2).sort((a,b)=>b.length-a.length)[0];
-  const en=strs.find(s=>/^[A-Za-z][A-Za-z .]{5,}$/.test(s)&&!/^[A-Z]{3,6}\d/.test(s));
-  const nx=(lines[i+1]||[]).join(' ');
-  out.push({kind:'m',src,trip,policy:pol,type:typeOf(pol),name:(ar||en||'').trim(),acid,nid,canceled:/cancel/i.test(txt)||(/cancel/i.test(nx)&&!polOf(nx))})});
- return out}
-async function ocr(pg){
- if(!window.Tesseract)await new Promise((r,j)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js';s.onload=r;s.onerror=j;document.head.appendChild(s)});
- const vp=pg.getViewport({scale:2}),cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;
- await pg.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;
- const d=await Tesseract.recognize(cv,'ara+eng');return d.data.text.split('\n').filter(l=>l.trim()).map(l=>l.trim().split(/\s{2,}/))}
-async function readPdf(f,log){
- await initPdf();const trip=(f.name.match(/(?:رقم|رحلة)\s*(\d+)/)||[])[1]||f.name.replace(/\.pdf$/i,'');
- const doc=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,out=[];
- for(let p=1;p<=doc.numPages;p++){
-  try{const pg=await doc.getPage(p),tc=await pg.getTextContent(),items=tc.items.filter(i=>i.str&&i.str.trim());
-   let lines,g=false;
-   if(items.length<5){lines=await ocr(pg)}else{
-    const all=items.map(i=>i.str).join('');g=[...all].filter(c=>{const k=c.charCodeAt(0);return k>=0x370&&k<=0x3FF}).length/all.length>.15;
-    const arr=items.map(i=>({s:g?unscr(i.str):i.str,x:i.transform[4],y:i.transform[5]})).sort((a,b)=>b.y-a.y||a.x-b.x);
-    lines=[];let cy=null;for(const it of arr){if(cy===null||Math.abs(it.y-cy)>4){lines.push([]);cy=it.y}lines[lines.length-1].push(it)}
-    lines=lines.map(l=>l.sort((a,b)=>a.x-b.x).map(i=>i.s.trim()).filter(Boolean))}
-   out.push(...parsePdfLines(lines,f.name,trip,g))
-  }catch(e){log(`مقدرتش أقرأ الجدول في الصفحة ${p} من ${f.name}`)}}
- return out}
-// ---------- قراءة الكشف ----------
-function fromCells(cells,src){
- cells=cells.map(c=>nd(String(c??'').replace(/\s+/g,' ').trim()));
- let ai=cells.findIndex(c=>/^\d{8,19}$/.test(c.replace(/\s/g,'')));if(ai<0)return null;
- const isTxt=(c,i)=>i!==ai&&/[\u0600-\u06FFA-Za-z]{2,}/.test(c);
- let ni=cells.findIndex((c,i)=>isTxt(c,i)&&c.split(' ').length>=2);if(ni<0)ni=cells.findIndex(isTxt);if(ni<0)return null;
- let name=cells[ni],note='';const mt=name.match(/\(([^)]*)\)/);if(mt){note=mt[1];name=name.replace(/\([^)]*\)/g,'').trim()}
- const ti=cells.findIndex((c,i)=>i!==ni&&isTxt(c,i));
- return{kind:'k',src,trip:'',policy:'',type:ti>=0?cells[ti]:'',name,acid:cells[ai].replace(/\s/g,''),nid:'',note,canceled:false}}
-async function readKash(f){
- const ext=f.name.split('.').pop().toLowerCase(),out=[];
- if(ext==='docx'){const h=(await mammoth.convertToHtml({arrayBuffer:await f.arrayBuffer()})).value,d=new DOMParser().parseFromString(h,'text/html');
-  d.querySelectorAll('tr').forEach(tr=>{const r=fromCells([...tr.children].map(c=>c.textContent),f.name);if(r)out.push(r)})}
- else{const wb=XLSX.read(ext==='csv'?await f.text():await f.arrayBuffer(),{type:ext==='csv'?'string':'array'});
-  wb.SheetNames.forEach(n=>XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false}).forEach(c=>{const r=fromCells(c,f.name);if(r)out.push(r)}))}
- return out}
-// ---------- رفع الملفات ----------
-const logs=[];function log(m){logs.push(m);const l=$('#log');l.hidden=false;l.innerHTML=logs.map(x=>`<div>${esc(x)}</div>`).join('')}
-async function load(files,kind){
- for(const f of files){
-  try{const r=kind==='m'?await readPdf(f,log):await readKash(f);
-   if(!r.length)log(`مفيش صفوف اتقرت من ${f.name}. راجع شكل الجدول.`);
-   r.forEach(x=>{x.id=S.n++;S.rows.push(x)})}
-  catch(e){log(`مقدرتش أقرأ الملف ${f.name}: ${e.message||e}`)}}
- preview()}
-for(const[k,i]of[['m','#fm'],['k','#fk']]){
- const z=$(k==='m'?'#dm':'#dk'),inp=$(i);
- inp.onchange=()=>{load([...inp.files],k);inp.value=''};
- z.ondragover=e=>{e.preventDefault();z.classList.add('on')};z.ondragleave=()=>z.classList.remove('on');
- z.ondrop=e=>{e.preventDefault();z.classList.remove('on');load([...e.dataTransfer.files],k)}}
-function preview(){
- $('#prev').hidden=!S.rows.length;const by={};S.rows.forEach(r=>(by[r.kind+r.src]??=[]).push(r));
- $('#pv').innerHTML=Object.values(by).map(rs=>`<details><summary>${rs[0].kind==='m'?'منافست':'كشف'}: ${esc(rs[0].src)} (${rs.length} صف)</summary><div class="wrap"><table><tr><th>البوليصة<th>الاسم<th>ACID<th>رقم قومي<th>النوع<th>ملغي<th></tr>`+
-  rs.map(r=>`<tr data-i="${r.id}">`+['policy','name','acid','nid','type'].map(f=>`<td contenteditable data-f="${f}" class="${f==='name'?'':'num'}">${esc(r[f])}</td>`).join('')+`<td><input type="checkbox" data-c ${r.canceled?'checked':''}></td><td><button data-d>حذف</button></td></tr>`).join('')+'</table></div></details>').join('');
- const trips=[...new Set(S.rows.filter(r=>r.kind==='m').map(r=>r.trip))],cur=$('#ft').value;
- $('#ft').innerHTML='<option value="">كل الرحلات</option>'+trips.map(t=>`<option ${t===cur?'selected':''}>${esc(t)}</option>`).join('')}
-$('#pv').addEventListener('input',e=>{const td=e.target.closest('[data-f]');if(td)S.rows.find(r=>r.id==td.parentNode.dataset.i)[td.dataset.f]=td.textContent.trim()});
-$('#pv').addEventListener('change',e=>{if(e.target.dataset.c!==undefined)S.rows.find(r=>r.id==e.target.closest('tr').dataset.i).canceled=e.target.checked});
-$('#pv').addEventListener('click',e=>{if(e.target.dataset.d!==undefined){const i=+e.target.closest('tr').dataset.i;S.rows=S.rows.filter(r=>r.id!==i);preview()}});
-// ---------- المقارنة ----------
-const ham1=(a,b)=>{if(a.length!==b.length||a===b)return false;let d=0;for(let i=0;i<a.length;i++)if(a[i]!==b[i]&&++d>1)return false;return d===1};
-async function compare(){
- const th=+$('#th').value/100;S.rows.forEach(r=>{r.n=norm(r.name);r.a=(r.acid||'').replace(/\D/g,'')});
- const M=S.rows.filter(r=>r.kind==='m'&&!/^(10|3279)/.test(r.a)),K=S.rows.filter(r=>r.kind==='k'&&r.a);
- const R={c1:[],c2:[],c3:[],c4:[]};$('#go').disabled=true;
- for(let i=0;i<M.length;i++){const m=M[i];
-  for(const k of K){
-   if(m.a&&m.a===k.a){m.n===k.n?R.c1.push({m,k,conf:100,why:'الاسم + ACID'+(m.nid?' + رقم قومي':'')}):R.c2.push({m,k,conf:Math.round(Math.max(0,cmp(m.n,k.n).s)*100),why:'ACID'})}
-   else{const c=cmp(m.n,k.n);
-    if(c.ok&&c.s>=th)R.c3.push({m,k,conf:Math.round(c.s*100),why:'الاسم'});
-    if(m.a&&ham1(m.a,k.a))R.c4.push({m,k,conf:Math.round(60+Math.max(0,c.s)*40),why:'ACID (فرق رقم واحد)'})}}
-  if(i%15===0){$('#go').textContent=`جاري المقارنة ${Math.round(i/M.length*100)}%`;await new Promise(r=>setTimeout(r))}}
- for(const k in R)R[k].sort((a,b)=>b.conf-a.conf);
- S.res=R;$('#go').disabled=false;$('#go').textContent='قارن';$('#out').hidden=false;S.tab='c1';render()}
-function dw(a,b){const sb=new Set(norm(b).split(' '));return a.split(/\s+/).map(w=>sb.has(norm(w))||!w?esc(w):`<mark>${esc(w)}</mark>`).join(' ')}
-function da(a,b){if(a.length!==b.length)return a===b?esc(a):`<mark>${esc(a)}</mark>`;return[...a].map((c,i)=>c===b[i]?c:`<mark>${c}</mark>`).join('')}
-function pass(r){const t=$('#ft').value,y=$('#fy').value;return!(t&&r.trip!==t)&&!(y&&r.type!==y)&&!($('#hc').checked&&r.canceled)}
-function render(){
- if(!S.res)return;const q=$('#q').value.trim(),tab=q?'sr':S.tab;
- $('#tabs').innerHTML=Object.keys(TABS).filter(k=>k!=='sr'||q).map(k=>`<button data-t="${k}" class="${k===tab?'on':''}">${TABS[k]}${k==='sr'?'':' ('+S.res[k].filter(x=>pass(x.m)).length+')'}</button>`).join('');
- let h;
- if(tab==='sr'){const nq=norm(q),dq=nd(q).replace(/\D/g,'');
-  const hit=S.rows.filter(r=>(nq&&norm(r.name).includes(nq))||(dq.length>3&&(r.acid||'').includes(dq)));
-  h=`<table><tr><th>الملف<th>المصدر<th>الرحلة<th>الاسم<th>ACID<th>البوليصة</tr>`+hit.map(r=>`<tr><td>${r.kind==='m'?'منافست':'كشف'}<td>${esc(r.src)}<td>${esc(r.trip)}<td>${esc(r.name)}<td class="num">${esc(r.acid)}<td class="num">${esc(r.policy)}</tr>`).join('')+'</table>'}
- else{const L=S.res[tab].filter(x=>pass(x.m));
-  h=L.length?`<table><tr><th>المصدر / الرحلة<th>البوليصة<th>الاسم (منافست)<th>الاسم (كشف)<th>ACID منافست<th>ACID كشف<th>الثقة<th>السبب</tr>`+L.map(({m,k,conf,why})=>`<tr><td>${esc(m.src)}<div class="m">رحلة ${esc(m.trip)} · ${esc(k.src)}</div><td class="num">${esc(m.policy)} ${m.canceled?'<span class="cx">ملغي</span>':''}<td>${dw(m.name,k.name)}${m.nid?`<div class="m num">${esc(m.nid)}</div>`:''}<td>${dw(k.name,m.name)}${k.note?`<div class="m">${esc(k.note)}</div>`:''}<td class="num">${da(m.a,k.a)}<td class="num">${da(k.a,m.a)}<td class="conf">${conf}%<td>${esc(why)}</tr>`).join('')+'</table>':'<p class="m">مفيش نتايج في الفئة دي.</p>'}
- $('#res').innerHTML=h}
-$('#tabs').onclick=e=>{if(e.target.dataset.t){S.tab=e.target.dataset.t;$('#q').value='';render()}};
-['#ft','#fy','#hc'].forEach(s=>$(s).onchange=render);$('#q').oninput=render;
-$('#go').onclick=()=>S.rows.length?compare():log('ارفع ملفات الأول.');
-let tm;$('#th').oninput=()=>{$('#thv').textContent=$('#th').value+'%';if(S.res){clearTimeout(tm);tm=setTimeout(compare,400)}};
-$('#ex').onclick=()=>{if(!S.res)return log('اعمل مقارنة الأول.');
- const wb=XLSX.utils.book_new();
- for(const k of['c1','c2','c3','c4']){const a=[['الملف','الرحلة','البوليصة','اسم المنافست','اسم الكشف','ACID منافست','ACID كشف','الثقة %','السبب']];
-  S.res[k].filter(x=>pass(x.m)).forEach(({m,k:q,conf,why})=>a.push([m.src,m.trip,m.policy,m.name,q.name,m.a,q.a,conf,why]));
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(a),TABS[k].replace(/[\\\/?*\[\]:]/g,'').slice(0,31))}
- XLSX.writeFile(wb,'نتائج-المقارنة.xlsx')};
+const log=m=>{$('log').hidden=false;const d=document.createElement('div');d.textContent=m;$('log').appendChild(d)};
+async function readSheet(f){const e=f.name.split('.').pop().toLowerCase();let rows=[];
+  if(e==='docx'){const h=(await mammoth.convertToHtml({arrayBuffer:await f.arrayBuffer()})).value,d=new DOMParser().parseFromString(h,'text/html');
+    rows=[...d.querySelectorAll('tr')].map(t=>[...t.querySelectorAll('td,th')].map(c=>c.textContent))}
+  else{const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});for(const n of wb.SheetNames)rows.push(...XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false}))}
+  return sheetFromRows(rows,f.name)}
+async function add(files,kind){for(const f of files){try{
+  if(kind==='m'){const r=await readPdf(f,pdfjsLib,log);S.man.push(...r.rows);log0(`${f.name}: ${r.rows.length} صف (نوع ${r.type})`)}
+  else{const r=await readSheet(f);S.sheet.push(...r);log0(`${f.name}: ${r.length} اسم`)}}catch(e){log('تعذرت قراءة '+f.name+': '+e.message)}}show()}
+const info=[];function log0(m){info.push(m)}
+function show(){$('info').hidden=false;const bad=S.man.filter(r=>/VXS/.test(r.policy)&&r.acid.length!==19).length;
+  $('info').innerHTML=info.map(esc).join('<br>')+`<div class="mu">منافست: ${S.man.length} صف | سيارات تصدير ACID ناقص: ${bad} | كشف: ${S.sheet.length} اسم</div>`}
+function pass(r){return(!$('ty').value||r.type===$('ty').value)&&!($('hc').checked&&r.canceled)}
+function draw(){if(!S.R)return;const q=norm($('q').value),F={};
+  for(const k in L)F[k]=S.R[k].filter(x=>pass(x.m)&&(!q||norm(x.m.name+' '+x.s.name).includes(q)||(x.m.acid+x.s.acid).includes(q)));
+  $('tabs').innerHTML=Object.keys(L).map(k=>`<button data-k="${k}" class="${S.tab===k?'on':''}">${L[k]} (${F[k].length})</button>`).join('');
+  const a=F[S.tab];$('out').innerHTML=a.length?`<table><tr><th>الملف</th><th>البوليصة</th><th>اسم المنافست</th><th>اسم الكشف</th><th>ACID المنافست</th><th>ACID الكشف</th><th>التشابه</th></tr>`+
+   a.map(x=>`<tr><td>${esc(x.m.file)}</td><td class="n">${esc(x.m.policy)}</td><td>${esc(x.m.name)}</td><td>${esc(x.s.name)}</td><td class="n">${esc(x.m.acid)}</td><td class="n">${esc(x.s.acid)}</td><td>${x.score}%</td></tr>`).join('')+'</table>':'<p class="mu">مفيش نتايج في الفئة دي.</p>';
+  window._F=F}
+function buildPrintRows(items){if(!items||!items.length)return '<div class="print-empty">مفيش نتايج</div>';
+  return `<table class="print-table"><thead><tr><th>م</th><th>الملف</th><th>رقم البوليصة</th><th>اسم المنافست</th><th>اسم الكشف</th><th>ACID المنافست</th><th>ACID الكشف</th><th>نسبة التشابه</th></tr></thead><tbody>${items.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.m.file)}</td><td class="ltr">${esc(x.m.policy)}</td><td>${esc(x.m.name)}</td><td>${esc(x.s.name)}</td><td class="ltr">${esc(x.m.acid)}</td><td class="ltr">${esc(x.s.acid)}</td><td>${x.score}%</td></tr>`).join('')}</tbody></table>`;}
+function renderPrintReport(){const F=window._F||{};const q=norm($('q').value);const type=$('ty').value;const hide=$('hc').checked;const summary=[`ملفات المنافست: ${S.man.map(r=>r.file).filter((v,i,a)=>a.indexOf(v)===i).join(', ')||'لا توجد'}`,
+  `عدد صفوف كل ملف: ${S.man.length ? S.man.map(r=>r.file).filter((v,i,a)=>a.indexOf(v)===i).map(f=>`${f}: ${S.man.filter(x=>x.file===f).length}`).join(' | ') : '0'}`,
+  `ملفات الكشف: ${S.sheet.map(r=>r.file).filter((v,i,a)=>a.indexOf(v)===i).join(', ')||'لا توجد'}`,
+  `عدد الأسماء: ${S.sheet.length}`,
+  `نسبة التشابه: ${$('th').value}%`,
+  `نوع الشحنة: ${type||'كل الأنواع'}`,
+  `إخفاء الملغي: ${hide?'نعم':'لا'}`,
+  `نص البحث: ${q||'بدون'}`].join(' | ');
+  const html=`<div class="print-report"><div class="print-header"><h2>تقرير مقارنة المنافست وكشف ACID</h2><div>${new Date().toLocaleString('ar-EG')}</div></div><div class="print-summary">${summary}</div>${Object.keys(L).map(k=>`<section class="print-section"><h3>${L[k]} (${(F[k]||[]).length})</h3>${buildPrintRows(F[k]||[])}</section>`).join('')}</div>`;
+  $('printArea').innerHTML=html;}
+function printCurrentReport(){if(!S.R||!window._F){log('اعمل المقارنة الأول.');return;}renderPrintReport();window.print();setTimeout(()=>{$('printArea').innerHTML='';},300);}
+$('go').onclick=()=>{if(!S.man.length||!S.sheet.length)return log('ارفع ملفات المنافست وملفات الكشف الأول.');S.R=compare(S.man,S.sheet,+$('th').value);$('res').hidden=false;draw()};
+$('th').oninput=()=>{$('tv').textContent=$('th').value+'%';if(S.R)$('go').click()};
+['ty','hc','q'].forEach(i=>$(i).addEventListener('input',draw));
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(b){S.tab=b.dataset.k;draw()}};
+$('clr').onclick=()=>{S.man=[];S.sheet=[];S.R=null;info.length=0;$('info').hidden=$('res').hidden=$('log').hidden=true;$('log').innerHTML=''};
+$('ex').onclick=()=>{if(!window._F)return log('اعمل المقارنة الأول.');const wb=XLSX.utils.book_new();
+  for(const k in L){const rows=[['الملف','البوليصة','اسم المنافست','اسم الكشف','ACID المنافست','ACID الكشف','التشابه']].concat(window._F[k].map(x=>[x.m.file,x.m.policy,x.m.name,x.s.name,x.m.acid,x.s.acid,x.score+'%']));
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),L[k].slice(0,31))}XLSX.writeFile(wb,'نتائج-المقارنة.xlsx')};
+$('pdf').onclick=printCurrentReport;
+for(const[i,d,k]of[['f1','d1','m'],['f2','d2','s']]){$(i).onchange=async e=>{await add(e.target.files,k);e.target.value=''};
+  $(d).ondragover=e=>{e.preventDefault();$(d).classList.add('on')};$(d).ondragleave=()=>$(d).classList.remove('on');
+  $(d).ondrop=async e=>{e.preventDefault();$(d).classList.remove('on');await add(e.dataTransfer.files,k)}}
 </script></body></html>
